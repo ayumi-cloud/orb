@@ -38,6 +38,7 @@ To determine whether to allow response _response_ to a request _request_, run th
 1. If _response_'s status is not an [ok status](https://fetch.spec.whatwg.org/#ok-status), then return false.
 1. If _mimeType_'s essence starts with "`audio/`", "`image/`", or "`video/`", then return false.
 1. If _mimeType_'s essence is "`text/csv`", then return false.
+1. Wait for end-of-file of _response_.
 1. If _response_'s body parses as JavaScript and does not parse as JSON, then return true.
 1. Return false.
 
