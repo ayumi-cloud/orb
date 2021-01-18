@@ -51,11 +51,7 @@ An **opaque-blocklisted-never-sniffed MIME type** is a MIME type whose essence i
 * "`text/event-stream`"
 * "`text/csv`"
 
-A user agent has an **opaque-safelisted media URLs set**. (This should be scoped similar to other network caches.)
-
-A request has an associated **opaque media identifier** (null or an opaque identifier). Null unless explicitly stated otherwise.
-
-\[The idea here is that the opaque media identifier is owned by the media element. As part of the element being GC'd, it would send a message to get all the relevant entries from the user agent's opaque-safelisted media URLs set removed. There might be better strategies available here and it's not clear to me to what extent we need to specify this, but it's probably good to have a model that does not leak memory forever so the set needs to be keyed to something. The fetch group might also be reasonable.]
+A request has an associated **opaque media URL** ("N/A", "initial-request", "not-opaque" or a URL). "N/A" unless explicitly stated otherwise.
 
 To determine whether to allow response _response_ to a request _request_, run these steps:
 
@@ -66,15 +62,16 @@ To determine whether to allow response _response_ to a request _request_, run th
    1. If _mimeType_ is an opaque-blocklisted-never-sniffed MIME type, then return false.
    1. If _response_'s status is 206 and _mimeType_ is an opaque-blocklisted MIME type, then return false.
    1. If _nosniff_ is true and _mimeType_ is an opaque-blocklisted MIME type or its essence is "`text/plain`", then return false.
-1. If the user agent's opaque-safelisted media URLs set contains (_request_'s opaque media identifier, _request_'s current URL), then return true.
+1. If _request_'s opaque media URL is "not-opaque", then return false.
+1. If _request_'s opaque media URL is a URL and it is equal to _request_'s current URL, then return true.
 1. Wait for 1024 bytes of _response_ or end-of-file, whichever comes first and let _bytes_ be those bytes.
 1. If the [audio or video type pattern matching algorithm](https://mimesniff.spec.whatwg.org/#audio-or-video-type-pattern-matching-algorithm) given _bytes_ does not return undefined, then:
-   1. If _requests_'s opaque media identifier is null, then return false.
+   1. If _requests_'s opaque media URL is not "initial-request", then return false.
    1. If _response_'s status is not an [ok status](https://fetch.spec.whatwg.org/#ok-status), then return false.
    1. Let _contentRange_ be the result of getting `Content-Range` from _response_'s header list.
    1. If _response_'s status is 206, _contentRange_ is non-null, and _contentRange_ does not start with `bytes 0-`, then return false.
-   1. Append (_request_'s opaque media identifier, _request_'s current URL) to the user agent's opaque-safelisted media URLs set and return true.
-1. If _requests_'s opaque media identifier is non-null, then return false.
+   1. Return true.
+1. If _requests_'s opaque media URL is not "N/A", then return false.
 1. If the [image type pattern matching algorithm](https://mimesniff.spec.whatwg.org/#image-type-pattern-matching-algorithm) given _bytes_ does not return undefined, then return true.
 1. If _nosniff_ is true, then return false.
 1. If _response_'s status is not an [ok status](https://fetch.spec.whatwg.org/#ok-status), then return false.
