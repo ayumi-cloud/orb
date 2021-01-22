@@ -67,8 +67,7 @@ To determine whether to allow response _response_ to a request _request_, run th
 1. If the [audio or video type pattern matching algorithm](https://mimesniff.spec.whatwg.org/#audio-or-video-type-pattern-matching-algorithm) given _bytes_ does not return undefined, then:
    1. If _requests_'s no-cors media URL is not "initial-request", then return false.
    1. If _response_'s status is not 200 or 206, then return false.
-   1. Let _contentRange_ be the result of getting `Content-Range` from _response_'s header list.
-   1. If _response_'s status is 206, _contentRange_ is non-null, and _contentRange_ does not start with `bytes 0-`, then return false.
+   1. If _response_'s status is 206 and [validate a partial response](https://wicg.github.io/background-fetch/#validate-a-partial-response) given 0 and _response_ returns invalid, then return false.
    1. Return true.
 1. If _requests_'s no-cors media URL is not "N/A", then return false.
 1. If the [image type pattern matching algorithm](https://mimesniff.spec.whatwg.org/#image-type-pattern-matching-algorithm) given _bytes_ does not return undefined, then return true.
